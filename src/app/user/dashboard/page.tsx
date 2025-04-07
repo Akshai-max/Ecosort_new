@@ -59,7 +59,11 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className={styles.loading}>Loading dashboard...</div>
+      <div className={styles.loading}>
+        <div className={styles.loader}>
+        </div>
+      </div>
+      
     );
   }
 

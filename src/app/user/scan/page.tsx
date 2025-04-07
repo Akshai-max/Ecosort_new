@@ -126,7 +126,10 @@ export default function ScanPage() {
 
   if (loading) {
     return (
-      <div className={styles.loading}>Loading scan page...</div>
+      <div className={styles.loading}>
+        <div className={styles.loader}>
+        </div>
+      </div>
     );
   }
 

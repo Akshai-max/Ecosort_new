@@ -245,6 +245,21 @@
   margin-bottom: 0.75rem;
 }
 
+.loader {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 8px solid;
+  border-color: #5CDB95 transparent #CCCCFF transparent; /* greenish, transparent, lavender, transparent */
+  animation: spin 1s linear infinite;
+  box-sizing: border-box;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .infoLabel {
   font-weight: 500;
   color: #6b7280;
@@ -455,7 +470,6 @@
   justify-content: center;
   min-height: 65vh;
   font-size: 1.25rem;
-  color: #6b7280;
 }
 
 .error {

@@ -101,7 +101,13 @@ export default function UserLayout({
   if (loading) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>Loading...</div>
+        <div className={styles.loading}>
+        <div className={styles.spinner_bouncer}>
+          <div className={styles.bounce} style={{ borderColor: '#7C74FF' }}></div>
+          <div className={styles.bounce} style={{ borderColor: '#00B2FF' }}></div>
+          <div className={styles.bounce} style={{ borderColor: '#5CDB95' }}></div>
+        </div>
+        </div>
       </div>
     );
   }
