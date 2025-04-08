@@ -26,7 +26,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      let endpoint = '/api/auth/login';
+      let endpoint = '/api/auth/user/login';
       
       // For employee login, we'll use the employee-specific endpoint
       if (userType === 'employee') {

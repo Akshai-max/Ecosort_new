@@ -65,7 +65,7 @@ export default function UserLayout({
   const handleLogout = async () => {
     try {
       // Call the logout API endpoint
-      const response = await fetch('/api/auth/logout', { 
+      const response = await fetch('/api/auth/user/logout', { 
         method: 'POST',
         credentials: 'include' // Important to include cookies
       });

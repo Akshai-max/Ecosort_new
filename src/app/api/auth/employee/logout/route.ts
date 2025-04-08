@@ -4,7 +4,7 @@ export async function POST() {
   try {
     // Create response
     const response = NextResponse.json(
-      { message: 'Logged out successfully' },
+      { message: 'Employee logged out successfully' },
       { status: 200 }
     );
     
@@ -17,8 +17,8 @@ export async function POST() {
       path: '/',
     });
     
-    // Also clear any other auth-related cookies if they exist
-    response.cookies.set('user', '', {
+    // Also clear any employee-specific cookies if they exist
+    response.cookies.set('employee', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -29,7 +29,7 @@ export async function POST() {
     return response;
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || 'Failed to logout' },
+      { error: error.message || 'Failed to logout employee' },
       { status: 500 }
     );
   }
