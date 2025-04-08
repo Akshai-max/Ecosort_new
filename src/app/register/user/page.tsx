@@ -447,6 +447,15 @@ export default function RegisterPage() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.bubbles}>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+      </div>
       <Link href="/" className={styles.brandText}>
         EcoSort
       </Link>

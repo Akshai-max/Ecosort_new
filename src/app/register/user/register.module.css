@@ -1,3 +1,15 @@
+@keyframes float {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
 .container {
   min-height: 93.4vh;
   display: flex;
@@ -6,6 +18,95 @@
   justify-content: center;
   background-color: #c9f7d7;
   padding: 2rem;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom right, #c9f7d7, #86efac);
+  z-index: 0;
+}
+
+.bubbles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.bubble {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  animation: float 6s ease-in-out infinite;
+}
+
+.bubble:nth-child(1) {
+  width: 420px;
+  height: 420px;
+  left: -6%;
+  top: -10%;
+  animation-duration: 8s;
+}
+
+.bubble:nth-child(2) {
+  width: 380px;
+  height: 380px;
+  left: 18%;
+  top: 7%;
+  animation-duration: 6s;
+  animation-delay: 1s;
+}
+
+.bubble:nth-child(3) {
+  width: 300px;
+  height: 300px;
+  left: 60%;
+  top: 5%;
+  animation-duration: 7s;
+  animation-delay: 2s;
+}
+
+.bubble:nth-child(4) {
+  width: 300px;
+  height: 300px;
+  left: 20%;
+  top: 65%;
+  animation-duration: 9s;
+}
+
+.bubble:nth-child(5) {
+  width: 330px;
+  height: 330px;
+  left: 65%;
+  top: 50%;
+  animation-duration: 7s;
+  animation-delay: 3s;
+}
+
+.bubble:nth-child(6) {
+  width: 250px;
+  height: 250px;
+  left: 83%;
+  top: 10%;
+  animation-duration: 8s;
+  animation-delay: 2s;
+}
+
+.bubble:nth-child(7) {
+  width: 500px;
+  height: 500px;
+  left: 85%;
+  top: 65%;
+  animation-duration: 6s;
+  animation-delay: 1s;
 }
 
 .brandText {
@@ -31,10 +132,13 @@
 }
 
 .formContainer {
-  max-width: 45rem;
+  max-width: 60rem;
   width: 100%;
   background-color: #ffffff;
   border-radius: 1rem;
+  z-index: 2;
+  background-color: white;
+  border-radius: 3rem;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
