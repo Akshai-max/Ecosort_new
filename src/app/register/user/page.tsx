@@ -152,7 +152,7 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -456,9 +456,9 @@ export default function RegisterPage() {
         <div className={styles.bubble}></div>
         <div className={styles.bubble}></div>
       </div>
-      <Link href="/" className={styles.brandText}>
+      <div className={styles.brandText}>
         EcoSort
-      </Link>
+      </div>
       <div className={styles.formContainer}>
         <div className={styles.logoContainer}>
           <h2 className={styles.title}>User Registration</h2>
