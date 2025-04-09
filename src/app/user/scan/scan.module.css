@@ -22,6 +22,8 @@
 
 .loader {
   width: 60px;
+  pointer-events: none;
+  caret-color: transparent;
   height: 60px;
   border-radius: 50%;
   border: 8px solid;
@@ -475,6 +477,8 @@
 
 .loading {
   display: flex;
+  pointer-events: none;
+  caret-color: transparent;
   justify-content: center;
   align-items: center;
   min-height: 65vh;

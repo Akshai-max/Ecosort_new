@@ -5,35 +5,9 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'EcoSort - Login',
-  description: 'Login to your EcoSort account',
-  icons: {
-    icon: [
-      {
-        url: '/favicon.ico',
-        sizes: 'any',
-      },
-      {
-        url: '/icon.png',
-        type: 'image/png',
-        sizes: '32x32',
-      },
-    ],
-    apple: [
-      {
-        url: '/apple-icon.png',
-        sizes: '180x180',
-        type: 'image/png',
-      },
-    ],
-    other: [
-      {
-        rel: 'mask-icon',
-        url: '/safari-pinned-tab.svg',
-        color: '#0f766e',
-      },
-    ],
-  },
+  title: 'EcoSort',
+  description: 'EcoSort - Real time waste sorting system',
+  icons: '/ecosort-logo.png',
   manifest: '/site.webmanifest',
 };
 

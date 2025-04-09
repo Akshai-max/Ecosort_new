@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import styles from './layout.module.css';
+import {
+  LayoutDashboard,
+  User,
+  ScanBarcode,
+  Trophy,
+  Gift,
+  Settings,
+  HelpCircle,
+  LogOut,
+} from "lucide-react";
 
 interface UserData {
   id: string;
@@ -100,7 +110,7 @@ export default function UserLayout({
 
   if (loading) {
     return (
-      <div className={styles.container}>
+      <div className={styles.container_loading}>
         <div className={styles.loading}>
         <div className={styles.spinner_bouncer}>
           <div className={styles.bounce} style={{ borderColor: '#7C74FF' }}></div>
@@ -134,55 +144,55 @@ export default function UserLayout({
             href="/user/dashboard" 
             className={`${styles.navItem} ${getActiveMenu() === 'dashboard' ? styles.activeNavItem : ''}`}
           >
-            <span className={styles.navIcon}>📊</span>
+            <span className={styles.navIcon}><LayoutDashboard style={{ width: "30px", height: "30px" }} className="w-6 h-6" /></span>
             <span className={styles.navText}>Dashboard</span>
           </Link>
           <Link 
             href="/user/profile" 
             className={`${styles.navItem} ${getActiveMenu() === 'profile' ? styles.activeNavItem : ''}`}
           >
-            <span className={styles.navIcon}>👤</span>
+            <span className={styles.navIcon}><User style={{ width: "30px", height: "30px" }} className="w-6 h-6" /></span>
             <span className={styles.navText}>Profile</span>
           </Link>
           <Link 
             href="/user/scan" 
             className={`${styles.navItem} ${getActiveMenu() === 'scan' ? styles.activeNavItem : ''}`}
           >
-            <span className={styles.navIcon}>📱</span>
+            <span className={styles.navIcon}><ScanBarcode style={{ width: "30px", height: "30px" }} className="w-6 h-6" /></span>
             <span className={styles.navText}>Scan Waste</span>
           </Link>
           <Link 
             href="/user/leaderboard" 
             className={`${styles.navItem} ${getActiveMenu() === 'leaderboard' ? styles.activeNavItem : ''}`}
           >
-            <span className={styles.navIcon}>🏆</span>
+            <span className={styles.navIcon}><Trophy style={{ width: "30px", height: "30px" }} className="w-6 h-6" /></span>
             <span className={styles.navText}>Leaderboard</span>
           </Link>
           <Link 
             href="/user/rewards" 
             className={`${styles.navItem} ${getActiveMenu() === 'rewards' ? styles.activeNavItem : ''}`}
           >
-            <span className={styles.navIcon}>🎁</span>
+            <span className={styles.navIcon}><Gift style={{ width: "30px", height: "30px" }} className="w-6 h-6" /></span>
             <span className={styles.navText}>Rewards</span>
           </Link>
           <Link 
             href="/user/settings" 
             className={`${styles.navItem} ${getActiveMenu() === 'settings' ? styles.activeNavItem : ''}`}
           >
-            <span className={styles.navIcon}>⚙️</span>
+            <span className={styles.navIcon}><Settings style={{ width: "30px", height: "30px" }} className="w-6 h-6" /></span>
             <span className={styles.navText}>Settings</span>
           </Link>
           <Link 
             href="/user/support" 
             className={`${styles.navItem} ${getActiveMenu() === 'support' ? styles.activeNavItem : ''}`}
           >
-            <span className={styles.navIcon}>❓</span>
+            <span className={styles.navIcon}><HelpCircle style={{ width: "30px", height: "30px" }} className="w-6 h-6" /></span>
             <span className={styles.navText}>Support</span>
           </Link>
         </nav>
         <div className={styles.sidebarFooter}>
           <button onClick={handleLogout} className={styles.logoutButton}>
-            <span className={styles.navIcon}>🚪</span>
+            <span className={styles.navIcon}><LogOut style={{ width: "30px", height: "30px" }} className="w-6 h-6" /></span>
             <span className={styles.navText}>Logout</span>
           </button>
         </div>

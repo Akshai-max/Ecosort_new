@@ -8,6 +8,18 @@
   background-color: #f9fafb;
 }
 
+.container_loading {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
+  pointer-events: none;
+  caret-color: transparent;
+}
+
 .sidebar {
   width: 250px;
   background-color: #16a34a;
@@ -30,8 +42,12 @@
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 3.5rem;
+  pointer-events: none;
+  caret-color: transparent;
+  letter-spacing: 0.02rem;
+  font-family: var(--font-cursive);
+  font-weight: 600;
   color: white;
 }
 
@@ -64,13 +80,16 @@
 }
 
 .navIcon {
+  margin-top: 0.35rem;
   margin-right: 0.75rem;
   font-size: 1.25rem;
 }
 
 .navText {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 1.08rem;
+  letter-spacing: 0.01rem;
+  font-family: var(--font-primary);
+  font-weight: 450;
 }
 
 .sidebarFooter {
@@ -105,24 +124,33 @@
 }
 
 .header {
+  pointer-events: none;
+  caret-color: transparent;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
+  align-items: left;
+  text-align: left;
+  padding: 1rem 2rem;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .headerTitle h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
+  pointer-events: none;
+  caret-color: transparent;
+  font-size: 2rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
   color: #111827;
   margin-bottom: 0.25rem;
 }
 
 .welcomeText {
+  pointer-events: none;
+  caret-color: transparent;
   color: #6b7280;
-  font-size: 0.875rem;
+  font-family: var(--font-primary);
+  font-size: 1rem;
 }
 
 .headerActions {
@@ -137,28 +165,33 @@
 }
 
 .userName {
-  font-size: 0.875rem;
+  font-size: 1.5rem;
+  font-family: var(--font-primary);
   font-weight: 500;
   color: #374151;
 }
 
 .userAvatar {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3.5rem;
+  pointer-events: none;
+  caret-color: transparent;
+  height: 3.5rem;
   border-radius: 50%;
+  font-family: var(--font-handwritten);
   background-color: #16a34a;
   color: white;
+  margin-left: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 1.5rem;
 }
 
 .content {
   flex: 1;
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1250px;
   margin: 0 auto;
   width: 100%;
 }
@@ -174,6 +207,8 @@
 
 .loading {
   display: flex;
+  pointer-events: none;
+  caret-color: transparent;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
@@ -183,6 +218,8 @@
 
 .spinner_bouncer {
   display: flex;
+  pointer-events: none;
+  caret-color: transparent;
   justify-content: center;
   align-items: center;
   gap: 1rem;
@@ -190,6 +227,8 @@
 
 .bounce {
   width: 32px;
+  pointer-events: none;
+  caret-color: transparent;
   height: 32px;
   border: 4px solid;
   border-radius: 50%;

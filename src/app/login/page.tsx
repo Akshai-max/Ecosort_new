@@ -148,14 +148,14 @@ export default function LoginPage() {
                   className={styles.checkbox}
                   disabled={loading}
                 />
-                <label htmlFor="rememberMe" className={styles.label}>
+                <label htmlFor="rememberMe" className={`${styles.label} ${styles.rememberMeLabel}`}>
                   Remember me
                 </label>
               </div>
               
               <button 
                 type="submit" 
-                className={styles.button}
+                className={`${styles.button} ${loading ? styles.buttonLoading : ''}`}
                 disabled={loading}
               >
                 {loading ? 'Signing in...' : 'Sign in'}

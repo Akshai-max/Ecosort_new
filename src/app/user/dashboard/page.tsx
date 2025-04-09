@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './dashboard.module.css';
+import { Coins, Trophy, ScanBarcode, BadgeCheck } from "lucide-react";
 
 interface UserData {
   id: string;
@@ -82,28 +83,28 @@ export default function DashboardPage() {
     <div className={styles.dashboardContainer}>
       <div className={styles.statsContainer}>
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>📊</div>
+          <div className={styles.statIcon}><Coins style={{ width: "40px", height: "40px" }} className="w-6 h-6 text-yellow-500" /></div>
           <div className={styles.statInfo}>
             <h3 className={styles.statTitle}>Total Points</h3>
             <p className={styles.statValue}>{user?.points || 0}</p>
           </div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>🏆</div>
+          <div className={styles.statIcon}><Trophy style={{ width: "40px", height: "40px" }} className="w-6 h-6 text-amber-600" /></div>
           <div className={styles.statInfo}>
             <h3 className={styles.statTitle}>Rank</h3>
             <p className={styles.statValue}>{user?.rank || 'Bronze'}</p>
           </div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>📱</div>
+          <div className={styles.statIcon}><ScanBarcode style={{ width: "40px", height: "40px" }} className="w-6 h-6 text-green-600" /></div>
           <div className={styles.statInfo}>
             <h3 className={styles.statTitle}>Scanned Items</h3>
             <p className={styles.statValue}>{user?.scannedItems || 0}</p>
           </div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>🎁</div>
+          <div className={styles.statIcon}><BadgeCheck style={{ width: "40px", height: "40px" }}className="w-6 h-6 text-purple-600" /></div>
           <div className={styles.statInfo}>
             <h3 className={styles.statTitle}>Rewards</h3>
             <p className={styles.statValue}>{user?.rewards || 0}</p>

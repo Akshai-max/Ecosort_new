@@ -11,6 +11,7 @@
 }
 
 .container {
+  font-family: var(--font-primary);
   min-height: 96.5vh;
   display: flex;
   align-items: center;
@@ -40,6 +41,7 @@
 
 .bubble {
   position: absolute;
+  pointer-events: none;
   width: 60px;
   height: 60px;
   background: rgba(255, 255, 255, 0.2);
@@ -128,6 +130,7 @@
 
 .logoContainer {
   width: 50%;
+  font-family: var(--font-primary);
   border-top-right-radius: 9.5rem;
   border-bottom-right-radius: 9.5rem;
   background-color: #16a34a;
@@ -151,11 +154,10 @@
 }
 
 .logo {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: contain;
-  margin-bottom: 1.5rem;
   position: relative;
   z-index: 1;
   background-color: white;
@@ -163,27 +165,30 @@
 }
 
 .title {
+  pointer-events: none;
   text-align: center;
-  font-size: 1.75rem;
+  font-size: 2rem;
+  letter-spacing: 0.1rem;
   font-weight: 700;
   color: white;
-  margin-bottom: 1rem;
   position: relative;
   z-index: 1;
 }
 
 .subtitle {
+  pointer-events: none;
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: rgba(255, 255, 255, 0.9);
-  max-width: 80%;
-  margin-bottom: 2.5rem;
+  max-width: 90%;
+  margin-bottom: 2rem;
   position: relative;
   z-index: 1;
   line-height: 1.5;
 }
 
 .featuresList {
+  pointer-events: none;
   list-style: none;
   padding: 0;
   margin: 0 0 3rem 0;
@@ -196,8 +201,9 @@
   display: flex;
   align-items: center;
   color: white;
-  font-size: 0.875rem;
+  font-size: 1.05rem;
   margin-bottom: 1.5rem;
+  letter-spacing: 0.05rem;
   padding: 0.5rem 1rem;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 0.5rem;
@@ -207,18 +213,19 @@
 .featureItem::before {
   content: '✓';
   margin-right: 0.75rem;
+  font-size: 1.12rem;
   font-weight: bold;
-  color: #4ade80;
+  color:rgb(200, 253, 218);
 }
 
 .employeeLoginLink {
   color: white;
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 1.2rem;
   padding: 0.75rem 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+  border-radius: 1rem;
+  transition: all 1s ease;
   margin-top: auto;
   position: relative;
   z-index: 1;
@@ -231,7 +238,7 @@
 .employeeLoginLink:hover {
   background-color: rgba(255, 255, 255, 0.2);
   border-color: white;
-  transform: translateY(-2px);
+  border-radius: 3rem;
 }
 
 .mainContent {
@@ -242,7 +249,10 @@
 }
 
 .userLoginTitle {
-  font-size: 2rem;
+  caret-color: transparent;
+  pointer-events: none;
+  font-size: 4rem;
+  font-family: var(--font-heading);
   font-weight: 700;
   color: #16a34a;
   margin-bottom: 2rem;
@@ -351,11 +361,19 @@
 }
 
 .label {
+  pointer-events: none;
+  caret-color: transparent;
   display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  margin-bottom: 0.7rem;
+  font-size: 1.05rem;
   font-weight: 500;
+  font-family: var(--font-primary);
   color: #374151;
+}
+
+.rememberMeLabel {
+  color: #374151;
+  margin-top: 0.5rem;
 }
 
 .input {
@@ -363,25 +381,26 @@
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-family: var(--font-primary);
+  font-size: 1rem;
   transition: all 0.15s ease-in-out;
   background-color: #f8fafc;
+  outline: none;
+  border-color: #16a34a;
 }
 
 .input:focus {
-  outline: none;
-  border-color: #16a34a;
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
 .error {
   color: #dc2626;
-  font-size: 0.875rem;
+  font-size: 1.17rem;
   text-align: center;
   margin-bottom: 1.5rem;
   padding: 0.75rem 1rem;
-  background-color: #fef2f2;
-  border: 1px solid #fee2e2;
+  background-color: #fff1f1;
+  border: 1px solid #fcbebe;
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
@@ -396,16 +415,22 @@
   color: white;
   border: none;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 1.2rem;
+  font-family: var(--font-primary);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.85s ease;
   margin-top: 1rem;
+}
+
+.buttonLoading {
+  background-color: #15803d;
+  border-radius: 2rem;
 }
 
 .button:hover {
   background-color: #15803d;
-  transform: translateY(-1px);
+  border-radius: 2rem;
 }
 
 .button:focus {
@@ -414,16 +439,21 @@
 }
 
 .footer {
+  pointer-events: none;
+  caret-color: transparent;
   margin-top: 1.5rem;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 1.05rem;
   color: #6b7280;
 }
 
 .link {
   color: #16a34a;
+  pointer-events:visible;
   text-decoration: none;
   font-weight: 500;
+  font-family: var(--font-primary);
+  font-size: 1.05rem;
   transition: all 0.2s ease;
 }
 
@@ -440,17 +470,35 @@
 }
 
 .checkbox {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 0.25rem;
-  border: 1px solid #d1d5db;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 0.3rem;
+  border: 2px solid #d1d5db;
+  border: 1px solid #16a34a;
   cursor: pointer;
   transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
 }
 
 .checkbox:checked {
   background-color: #16a34a;
   border-color: #16a34a;
+}
+
+.checkbox:hover {
+  box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.1);
+}
+
+.checkbox:checked::after {
+  content: '✓';
+  font-size: 1rem;
+  left: 0.15rem;
+  bottom: 0.01px;
+  color: white;
+  position: absolute;
 }
 
 /* Employee specific styles */
