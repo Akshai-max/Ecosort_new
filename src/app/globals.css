@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Clash+Display:wght@200;300;400;500;600;700&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Kalam:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Clash+Display:wght@200;300;400;500;600;700&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Kalam:wght@300;400;700&family=Indie+Flower&family=Shadows+Into+Light&family=Permanent+Marker&family=Pacifico&family=Comic+Neue:wght@300;400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,6 +15,11 @@
   --font-handwritten: 'Caveat', cursive;
   --font-cursive: 'Dancing Script', cursive;
   --font-casual: 'Kalam', cursive;
+  --font-playful: 'Indie Flower', cursive;
+  --font-shadow: 'Shadows Into Light', cursive;
+  --font-marker: 'Permanent Marker', cursive;
+  --font-fancy: 'Pacifico', cursive;
+  --font-comic: 'Comic Neue', cursive;
 }
 
 body {
@@ -61,5 +66,30 @@ h1, h2, h3, h4, h5, h6 {
 
 .casual {
   font-family: var(--font-casual);
+  font-weight: 400;
+}
+
+.playful {
+  font-family: var(--font-playful);
+  font-weight: 400;
+}
+
+.shadow-text {
+  font-family: var(--font-shadow);
+  font-weight: 400;
+}
+
+.marker-text {
+  font-family: var(--font-marker);
+  font-weight: 400;
+}
+
+.fancy-text {
+  font-family: var(--font-fancy);
+  font-weight: 400;
+}
+
+.comic-text {
+  font-family: var(--font-comic);
   font-weight: 400;
 } 

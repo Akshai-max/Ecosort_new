@@ -203,7 +203,7 @@ export default function UserLayout({
           <div className={styles.headerTitle}>
             <h1>{getActiveMenu().charAt(0).toUpperCase() + getActiveMenu().slice(1)}</h1>
             <p className={styles.welcomeText}>
-              Welcome back, {user?.firstName} {user?.lastName}!
+              Welcome back,<span className={styles.welcomeTextName}> {user?.firstName} {user?.lastName}!</span>
             </p>
           </div>
           <div className={styles.headerActions}>
