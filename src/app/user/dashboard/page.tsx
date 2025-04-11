@@ -130,7 +130,7 @@ export default function DashboardPage() {
           <div className={styles.cardContent}>
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>Name:</span>
-              <span className={styles.infoValue}>{user?.firstName} {user?.lastName}</span>
+              <span className={styles.userName}>{user?.firstName} {user?.lastName}</span>
             </div>
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>Email:</span>

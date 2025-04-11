@@ -163,7 +163,7 @@
 
 .statsContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -217,7 +217,7 @@
 
 .dashboardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -280,6 +280,13 @@
   font-weight: 500;
   color: #6b7280;
   width: 80px;
+}
+
+.userName{
+  text-transform: capitalize;
+  color: #374151d8;
+  font-size: 17.44px;
+  flex: 1;
 }
 
 .infoValue {

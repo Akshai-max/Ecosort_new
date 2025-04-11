@@ -172,6 +172,7 @@ export default function ProfilePage() {
           <div className={styles.floatingIcon}><Wind size={34} strokeWidth={1.5} /></div>
           <div className={styles.floatingIcon}><Droplets size={26} strokeWidth={1.5} /></div>
           <div className={styles.floatingIcon}><Sun size={38} strokeWidth={1.5} /></div>
+          <div className={styles.floatingIcon}><Star size={30} strokeWidth={1.5} /></div>
           <div className={styles.headerContent}>
             <div className={styles.avatar}>
               {profile?.firstName?.[0]}{profile?.lastName?.[0]}
