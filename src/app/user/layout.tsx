@@ -124,7 +124,7 @@ export default function UserLayout({
 
   if (error) {
     return (
-      <div className={styles.container}>
+      <div className={styles.errorContainer}>
         <div className={styles.error}>{error}</div>
         <button onClick={() => router.push('/login')} className={styles.button}>
           Return to Login
