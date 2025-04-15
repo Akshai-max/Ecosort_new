@@ -12,7 +12,9 @@ import {
   Sprout,
   Wind,
   Droplets,
-  Sun
+  Sun,
+  Check,
+  ChevronDown
 } from 'lucide-react';
 import styles from './profile.module.css';
 
@@ -67,6 +69,7 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -128,9 +131,23 @@ export default function ProfilePage() {
 
       setProfile(editedProfile);
       setIsEditing(false);
+      
+      // Show success notification
+      setShowSuccess(true);
+      
+      // Hide success notification after 3 seconds
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditedProfile(profile);
   };
 
   if (loading) {
@@ -155,6 +172,154 @@ export default function ProfilePage() {
           >
             Return to Login
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isEditing) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.editFormContainer}>
+          <div className={styles.editFormHeader}>
+            <h1 className={styles.editFormTitle}>Edit profile</h1>
+            <div className={styles.editFormAvatar}>
+              {profile?.firstName?.[0]}{profile?.lastName?.[0]}
+            </div>
+          </div>
+          
+          <div className={styles.editFormContent}>
+            <div className={styles.editFormGrid}>
+              <div className={styles.editFormGroup}>
+                <label htmlFor="firstName" className={styles.editFormLabel}>First Name</label>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  className={styles.editFormInput}
+                  value={editedProfile?.firstName || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className={styles.editFormGroup}>
+                <label htmlFor="lastName" className={styles.editFormLabel}>Last Name</label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  className={styles.editFormInput}
+                  value={editedProfile?.lastName || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className={styles.editFormGroupFull}>
+                <label htmlFor="email" className={styles.editFormLabel}>Email</label>
+                <div className={styles.editFormInputWithIcon}>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    className={styles.editFormInput}
+                    value={editedProfile?.email || ''}
+                    onChange={handleInputChange}
+                  />
+                  <span className={styles.editFormInputCheck}>
+                    <Check size={18} color="#16a34a" />
+                  </span>
+                </div>
+              </div>
+              
+              <div className={styles.editFormGroupFull}>
+                <label htmlFor="address.street" className={styles.editFormLabel}>Address</label>
+                <input
+                  id="address.street"
+                  name="address.street"
+                  type="text"
+                  className={styles.editFormInput}
+                  value={editedProfile?.address?.street || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className={styles.editFormGroup}>
+                <label htmlFor="phone" className={styles.editFormLabel}>Contact Number</label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  className={styles.editFormInput}
+                  value={editedProfile?.phone || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className={styles.editFormGroup}>
+                <label htmlFor="address.city" className={styles.editFormLabel}>City</label>
+                <div className={styles.editFormSelect}>
+                  <input
+                    id="address.city"
+                    name="address.city"
+                    type="text"
+                    className={styles.editFormInput}
+                    value={editedProfile?.address?.city || ''}
+                    onChange={handleInputChange}
+                  />
+                  <ChevronDown size={18} className={styles.editFormSelectIcon} />
+                </div>
+              </div>
+              
+              <div className={styles.editFormGroup}>
+                <label htmlFor="address.state" className={styles.editFormLabel}>State</label>
+                <div className={styles.editFormSelect}>
+                  <input
+                    id="address.state"
+                    name="address.state"
+                    type="text"
+                    className={styles.editFormInput}
+                    value={editedProfile?.address?.state || ''}
+                    onChange={handleInputChange}
+                  />
+                  <ChevronDown size={18} className={styles.editFormSelectIcon} />
+                </div>
+              </div>
+              
+              <div className={styles.editFormGroupFull}>
+                <label htmlFor="password" className={styles.editFormLabel}>Password</label>
+                <div className={styles.editFormInputWithIcon}>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    className={styles.editFormInput}
+                    value="••••••••••••"
+                    disabled
+                  />
+                  <span className={styles.editFormInputCheck}>
+                    <Check size={18} color="#16a34a" />
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className={styles.editFormActions}>
+              <button
+                type="button"
+                className={styles.editFormCancelButton}
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={styles.editFormSaveButton}
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -203,32 +368,12 @@ export default function ProfilePage() {
           </div>
 
           <div className={styles.actions}>
-            {!isEditing ? (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className={styles.editButton}
-              >
-                Edit Profile
-              </button>
-            ) : (
-              <>
-                <button 
-                  onClick={() => {
-                    setIsEditing(false);
-                    setEditedProfile(profile);
-                  }}
-                  className={styles.cancelButton}
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleSave}
-                  className={styles.saveButton}
-                >
-                  Save Changes
-                </button>
-              </>
-            )}
+            <button 
+              onClick={() => setIsEditing(true)}
+              className={styles.editButton}
+            >
+              Edit Profile
+            </button>
           </div>
         </div>
 
@@ -239,94 +384,29 @@ export default function ProfilePage() {
               <div className={styles.infoGrid}>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>First Name</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={editedProfile?.firstName || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>{profile?.firstName}</span>
-                  )}
+                  <span className={styles.value}>{profile?.firstName}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Last Name</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={editedProfile?.lastName || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>{profile?.lastName}</span>
-                  )}
+                  <span className={styles.value}>{profile?.lastName}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Email</span>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={editedProfile?.email || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>{profile?.email}</span>
-                  )}
+                  <span className={styles.value}>{profile?.email}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Phone</span>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={editedProfile?.phone || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>{profile?.phone}</span>
-                  )}
+                  <span className={styles.value}>{profile?.phone}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Date of Birth</span>
-                  {isEditing ? (
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      value={editedProfile?.dateOfBirth?.split('T')[0] || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>
-                      {profile?.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : 'Not set'}
-                    </span>
-                  )}
+                  <span className={styles.value}>
+                    {profile?.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : 'Not set'}
+                  </span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Gender</span>
-                  {isEditing ? (
-                    <select
-                      name="gender"
-                      value={editedProfile?.gender || ''}
-                      onChange={handleInputChange}
-                      className={styles.select}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                      <option value="prefer-not-to-say">Prefer not to say</option>
-                    </select>
-                  ) : (
-                    <span className={styles.value}>{profile?.gender || 'Not set'}</span>
-                  )}
+                  <span className={styles.value}>{profile?.gender || 'Not set'}</span>
                 </div>
               </div>
             </div>
@@ -336,59 +416,19 @@ export default function ProfilePage() {
               <div className={styles.addressGrid}>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>Street</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="address.street"
-                      value={editedProfile?.address?.street || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>{profile?.address?.street || 'Not set'}</span>
-                  )}
+                  <span className={styles.value}>{profile?.address?.street || 'Not set'}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>City</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="address.city"
-                      value={editedProfile?.address?.city || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>{profile?.address?.city || 'Not set'}</span>
-                  )}
+                  <span className={styles.value}>{profile?.address?.city || 'Not set'}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>State</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="address.state"
-                      value={editedProfile?.address?.state || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>{profile?.address?.state || 'Not set'}</span>
-                  )}
+                  <span className={styles.value}>{profile?.address?.state || 'Not set'}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.label}>PIN Code</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="address.pincode"
-                      value={editedProfile?.address?.pincode || ''}
-                      onChange={handleInputChange}
-                      className={styles.input}
-                    />
-                  ) : (
-                    <span className={styles.value}>{profile?.address?.pincode || 'Not set'}</span>
-                  )}
+                  <span className={styles.value}>{profile?.address?.pincode || 'Not set'}</span>
                 </div>
               </div>
             </div>
@@ -470,6 +510,19 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      
+      {showSuccess && (
+        <div className={styles.successNotification}>
+          <div className={styles.successIcon}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="16" height="16">
+              <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className={styles.successMessage}>
+            Profile updated successfully!
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

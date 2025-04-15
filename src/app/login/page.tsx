@@ -15,6 +15,7 @@ export default function LoginPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +45,14 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(data.user));
       }
 
-      router.push('/user/dashboard');
+      // Show success notification
+      setShowSuccess(true);
+      
+      // Redirect after showing the notification
+      setTimeout(() => {
+        router.push('/user/dashboard');
+      }, 2000);
+      
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
     } finally {
@@ -176,6 +184,19 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+      
+      {showSuccess && (
+        <div className={styles.successNotification}>
+          <div className={styles.successIcon}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="16" height="16">
+              <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className={styles.successMessage}>
+            Login successful ! Redirecting to dashboard...
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

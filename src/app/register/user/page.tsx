@@ -51,6 +51,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const validateStep = (step: number): boolean => {
     setError('');
@@ -166,8 +167,14 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Redirect to dashboard based on role
-      router.push('/login');
+      // Show success notification
+      setShowSuccess(true);
+      
+      // Redirect after showing the notification
+      setTimeout(() => {
+        router.push('/login');
+      }, 3000);
+      
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -533,6 +540,19 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+      
+      {showSuccess && (
+        <div className={styles.successNotification}>
+          <div className={styles.successIcon}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="16" height="16">
+              <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className={styles.successMessage}>
+            Registration successful! Redirecting to login page...
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
