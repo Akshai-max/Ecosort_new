@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: 'User not found' },
         { status: 401 }
       );
     }
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: 'Invalid password' },
         { status: 401 }
       );
     }
@@ -60,8 +60,9 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error: any) {
+    console.log(error);
     return NextResponse.json(
-      { error: error.message || 'Login failed' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

@@ -22,8 +22,9 @@ export async function POST() {
     
     return response;
   } catch (error: any) {
+    console.log(error);
     return NextResponse.json(
-      { error: error.message || 'Failed to logout user' },
+      { error: 'Failed to logout user' },
       { status: 500 }
     );
   }

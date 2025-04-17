@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './manager.module.css';
 
 export default function ManagerLoginPage() {
@@ -13,10 +14,12 @@ export default function ManagerLoginPage() {
     rememberMe: false,
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
       // TODO: Implement actual authentication logic here
@@ -24,6 +27,8 @@ export default function ManagerLoginPage() {
       router.push('/manager/dashboard');
     } catch (err) {
       setError('Invalid credentials');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,13 +42,40 @@ export default function ManagerLoginPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.brandText}>
-        EcoSort
+      <div className={styles.bubbles}>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
+        <div className={styles.bubble}></div>
       </div>
+      <Link href="/" className={styles.brandText}>
+        EcoSort
+      </Link>
       <div className={styles.formContainer}>
         <div className={styles.logoContainer}>
-          <h2 className={styles.title}>Manager Portal</h2>
-          <p className={styles.subtitle}>Operations Management</p>
+          <Image
+            src="/ecosort-logo.png"
+            alt="EcoSort Logo"
+            width={120}
+            height={120}
+            className={styles.logo}
+            priority
+          />
+          <h1 className={styles.title}>Welcome Back</h1>
+          <p className={styles.subtitle}>
+            Sign in to access your manager dashboard and manage operations
+          </p>
+          
+          <ul className={styles.featuresList}>
+            <li className={styles.featureItem}>Operations Management</li>
+            <li className={styles.featureItem}>Team Coordination</li>
+            <li className={styles.featureItem}>Performance Analytics</li>
+            <li className={styles.featureItem}>Resource Allocation</li>
+            <li className={styles.featureItem}>Real-time Monitoring</li>
+          </ul>
         </div>
         
         <div className={styles.formContent}>
@@ -62,8 +94,10 @@ export default function ManagerLoginPage() {
                 placeholder="Enter manager email"
                 value={formData.email}
                 onChange={handleChange}
+                disabled={loading}
               />
             </div>
+
             <div className={styles.inputGroup}>
               <label htmlFor="password" className={styles.label}>
                 Password
@@ -78,6 +112,7 @@ export default function ManagerLoginPage() {
                 placeholder="Enter password"
                 value={formData.password}
                 onChange={handleChange}
+                disabled={loading}
               />
             </div>
 
@@ -89,6 +124,7 @@ export default function ManagerLoginPage() {
                 checked={formData.rememberMe}
                 onChange={handleChange}
                 className={styles.checkbox}
+                disabled={loading}
               />
               <label htmlFor="rememberMe" className={styles.label}>
                 Remember me
@@ -101,8 +137,12 @@ export default function ManagerLoginPage() {
               </div>
             )}
 
-            <button type="submit" className={styles.button}>
-              Sign in as Manager
+            <button 
+              type="submit" 
+              className={`${styles.button} ${loading ? styles.buttonLoading : ''}`}
+              disabled={loading}
+            >
+              {loading ? 'Signing in...' : 'Sign in as Manager'}
             </button>
           </form>
 

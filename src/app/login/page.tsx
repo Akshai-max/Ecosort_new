@@ -8,6 +8,7 @@ import styles from './login.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [isEmployeeLogin, setIsEmployeeLogin] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -80,7 +81,7 @@ export default function LoginPage() {
         <div className={styles.bubble}></div>
       </div>
       <div className={styles.formContainer}>
-        <div className={styles.logoContainer}>
+        <div className={`${styles.logoContainer} ${isEmployeeLogin ? styles.slideRight : ''}`}>
           <Image
             src="/ecosort-logo.png"
             alt="EcoSort Logo"
@@ -100,88 +101,186 @@ export default function LoginPage() {
             <li className={styles.featureItem}>24/7 customer support</li>
           </ul>
 
-          <Link href="/employee-login" className={styles.employeeLoginLink}>
-            <span>Employee Portal</span>
-            <span>→</span>
-          </Link>
+          <button 
+            onClick={() => {
+              setIsEmployeeLogin(!isEmployeeLogin);
+              const logoContainer = document.querySelector(`.${styles.logoContainer}`);
+              logoContainer?.classList.add(styles.slideRight);
+              const mainContent = document.querySelector(`.${styles.mainContent}`); 
+              mainContent?.classList.add();
+            }}
+            className={styles.employeeLoginLink}
+          >
+            <span style={{
+              opacity: isEmployeeLogin ? 1 : 0,
+              transition: 'opacity 0.3s ease'
+            }}>←</span>
+            <span>{isEmployeeLogin ? 'User Portal' : 'Employee Portal'}</span>
+            <span style={{
+              opacity: !isEmployeeLogin ? 1 : 0, 
+              transition: 'opacity 0.3s ease'
+            }}>→</span>
+          </button>
         </div>
         
-        <div className={styles.mainContent}>
-          <h2 className={styles.userLoginTitle}>User Login</h2>
-          <div className={styles.formContent}>
-            {error && <div className={styles.error}>{error}</div>}
-            <form className={styles.form} onSubmit={handleSubmit}>
-              <div className={styles.inputGroup}>
-                <label htmlFor="email" className={styles.label}>
-                  Email address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className={styles.input}
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label htmlFor="password" className={styles.label}>
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className={styles.input}
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              </div>
+        <div className={`${styles.mainContent} ${isEmployeeLogin ? styles.fadeOut : ''}`}>
+            <>
+              <h2 className={styles.userLoginTitle}>User Login</h2>
+              <div className={styles.formContent}>
+                {error && <div className={styles.error}>{error}</div>}
+                <form className={styles.form} onSubmit={handleSubmit}>
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="email" className={styles.label}>
+                      Email address
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      className={styles.input}
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="password" className={styles.label}>
+                      Password
+                    </label>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      className={styles.input}
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      disabled={loading}
+                    />
+                  </div>
 
-              <div className={styles.rememberMe}>
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                  className={styles.checkbox}
-                  disabled={loading}
-                />
-                <label htmlFor="rememberMe" className={`${styles.label} ${styles.rememberMeLabel}`}>
-                  Remember me
-                </label>
-              </div>
-              
-              <button 
-                type="submit" 
-                className={`${styles.button} ${loading ? styles.buttonLoading : ''}`}
-                disabled={loading}
-              >
-                {loading ? 'Signing in...' : 'Sign in'}
-              </button>
+                  <div className={styles.rememberMe}>
+                    <input
+                      type="checkbox"
+                      id="rememberMe"
+                      name="rememberMe"
+                      checked={formData.rememberMe}
+                      onChange={handleChange}
+                      className={styles.checkbox}
+                      disabled={loading}
+                    />
+                    <label htmlFor="rememberMe" className={`${styles.label} ${styles.rememberMeLabel}`}>
+                      Remember me
+                    </label>
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    className={`${styles.button} ${loading ? styles.buttonLoading : ''}`}
+                    disabled={loading}
+                  >
+                    {loading ? 'Signing in...' : 'Sign in'}
+                  </button>
 
-              <div className={styles.footer}>
-                <Link href="/forgot-password" className={styles.link}>
-                  Forgot your password?
-                </Link>
-                <p className={styles.footer}>
-                  Don't have an account?{' '}
-                  <Link href="/register/user" className={styles.link}>
-                    Create One
-                  </Link>
-                </p>
+                  <div className={styles.footer}>
+                    <Link href="/forgot-password" className={styles.link}>
+                      Forgot your password?
+                    </Link>
+                    <p className={styles.footer}>
+                      Don't have an account?{' '}
+                      <Link href="/register/user" className={styles.link}>
+                        Create One
+                      </Link>
+                    </p>
+                  </div>
+                </form>
               </div>
-            </form>
-          </div>
+            </>
+        </div>
+
+        <div className={`${styles.employeeContent} ${isEmployeeLogin ? styles.fadeIn : ''}`}>
+            <>
+              <h2 className={styles.userLoginTitle}>Employee Login</h2>
+              <div className={styles.formContent}>
+                {error && <div className={styles.error}>{error}</div>}
+                <form className={styles.form} onSubmit={handleSubmit}>
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="employeeId" className={styles.label}>
+                      Employee ID
+                    </label>
+                    <input
+                      id="employeeId"
+                      name="email"
+                      type="text"
+                      autoComplete="username"
+                      required
+                      className={styles.input}
+                      placeholder="Enter your employee ID"
+                      value={formData.email}
+                      onChange={handleChange}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="employeePassword" className={styles.label}>
+                      Password
+                    </label>
+                    <input
+                      id="employeePassword"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      className={styles.input}
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <div className={styles.rememberMe}>
+                    <input
+                      type="checkbox"
+                      id="employeeRememberMe"
+                      name="rememberMe"
+                      checked={formData.rememberMe}
+                      onChange={handleChange}
+                      className={styles.checkbox}
+                      disabled={loading}
+                    />
+                    <label htmlFor="employeeRememberMe" className={`${styles.label} ${styles.rememberMeLabel}`}>
+                      Remember me
+                    </label>
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    className={`${styles.button} ${loading ? styles.buttonLoading : ''}`}
+                    disabled={loading}
+                  >
+                    {loading ? 'Signing in...' : 'Sign in'}
+                  </button>
+
+                  <div className={styles.footer}>
+                    <Link href="/forgot-password" className={styles.link}>
+                      Forgot your password?
+                    </Link>
+                    <p className={styles.footer}>
+                      Don't have an account?{' '}
+                      <Link href="/register/employee" className={styles.link}>
+                        Create One
+                      </Link>
+                    </p>
+                  </div>
+                </form>
+              </div>
+            </>
         </div>
       </div>
       

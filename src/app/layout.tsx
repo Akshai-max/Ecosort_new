@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'EcoSort',
   description: 'EcoSort - Real time waste sorting system',
   icons: '/ecosort-logo.png',
-  manifest: '/site.webmanifest',
+  manifest: '/site.webmanifest', // This specifies the path to the web app manifest file which provides metadata for PWA functionality
 };
 
 export default function RootLayout({
