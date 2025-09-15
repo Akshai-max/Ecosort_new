@@ -1,55 +1,75 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
+import Employee from '@/models/Employee';
 import { generateToken } from '@/lib/auth';
 
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const { email, password, employeeId } = await req.json();
+    const { employeeId, password } = await req.json();
 
-    // TODO: Implement employee-specific authentication logic
-    // This should check for employee-specific credentials and permissions
+    // Find employee by employeeId
+    const employee = await Employee.findOne({ 
+      employeeId: employeeId.trim()
+    }).select('+password');
     
-    // For now, we'll use the same logic as user login but with a role check
-    const user = await User.findOne({ email, role: 'employee' }).select('+password');
-    
-    if (!user) {
+    if (!employee) {
       return NextResponse.json(
-        { error: 'Invalid employee credentials' },
+        { error: 'Employee not found' },
+        { status: 401 }
+      );
+    }
+
+    // Check if employee is active
+    if (!employee.isActive) {
+      return NextResponse.json(
+        { error: 'Employee account is deactivated' },
         { status: 401 }
       );
     }
 
     // Check password
-    const isPasswordValid = await user.comparePassword(password);
+    const isPasswordValid = await employee.comparePassword(password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Invalid employee credentials' },
+        { error: 'Invalid password' },
         { status: 401 }
       );
     }
 
-    // TODO: Verify employee ID if needed
-    // This would be a separate check for employee-specific authentication
+    // Update last login
+    await employee.updateLastLogin();
 
     // Generate token
     const token = generateToken({
-      id: user._id.toString(),
-      email: user.email,
-      role: user.role,
+      id: employee._id.toString(),
+      email: employee.email,
+      role: 'employee',
     });
 
-    // Create response with user data and token
+    // Create response with employee data and token
     const response = NextResponse.json(
       {
-        user: {
-          id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          role: user.role,
+        employee: {
+          id: employee._id,
+          name: employee.name,
+          email: employee.email,
+          employeeId: employee.employeeId,
+          department: employee.department,
+          position: employee.position,
+          zoneId: employee.zoneId,
+          zoneName: employee.zoneName,
+          hireDate: employee.hireDate,
+          phone: employee.phone,
+          address: employee.address,
+          dateOfBirth: employee.dateOfBirth,
+          gender: employee.gender,
+          points: employee.points,
+          rank: employee.rank,
+          isActive: employee.isActive,
+          lastLogin: employee.lastLogin,
+          preferences: employee.preferences
         },
         token,
       },
@@ -67,9 +87,10 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error: any) {
+    console.log('Employee login error:', error);
     return NextResponse.json(
-      { error: error.message || 'Employee login failed' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
-} 
+}

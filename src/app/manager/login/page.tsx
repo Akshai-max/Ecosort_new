@@ -9,8 +9,8 @@ import styles from './manager.module.css';
 export default function ManagerLoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: 'manager@ecosort.com',
+    password: 'Manager123!',
     rememberMe: false,
   });
   const [error, setError] = useState('');
@@ -22,11 +22,36 @@ export default function ManagerLoginPage() {
     setLoading(true);
 
     try {
-      // TODO: Implement actual authentication logic here
       console.log('Manager login attempt with:', formData);
+      
+      const response = await fetch('/api/auth/manager/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+        credentials: 'include', // Important for cookies
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      console.log('Manager login successful:', data);
+      
+      // Store manager data in localStorage for quick access
+      localStorage.setItem('manager', JSON.stringify(data.manager));
+      
+      // Redirect to dashboard
       router.push('/manager/dashboard');
-    } catch (err) {
-      setError('Invalid credentials');
+    } catch (err: any) {
+      console.error('Manager login error:', err);
+      setError(err.message || 'Invalid credentials');
     } finally {
       setLoading(false);
     }
@@ -50,7 +75,7 @@ export default function ManagerLoginPage() {
         <div className={styles.bubble}></div>
         <div className={styles.bubble}></div>
         <div className={styles.bubble}></div>
-      </div>
+          </div>
       <Link href="/" className={styles.brandText}>
         EcoSort
       </Link>
@@ -77,48 +102,48 @@ export default function ManagerLoginPage() {
             <li className={styles.featureItem}>Real-time Monitoring</li>
           </ul>
         </div>
-        
+
         <div className={styles.formContent}>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputGroup}>
               <label htmlFor="email" className={styles.label}>
                 Manager Email
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
                 className={styles.input}
                 placeholder="Enter manager email"
-                value={formData.email}
+                  value={formData.email}
                 onChange={handleChange}
                 disabled={loading}
-              />
+                />
             </div>
 
             <div className={styles.inputGroup}>
               <label htmlFor="password" className={styles.label}>
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
+                <input
+                  id="password"
+                  name="password"
                 type="password"
-                autoComplete="current-password"
-                required
+                  autoComplete="current-password"
+                  required
                 className={styles.input}
                 placeholder="Enter password"
-                value={formData.password}
+                  value={formData.password}
                 onChange={handleChange}
                 disabled={loading}
               />
             </div>
 
             <div className={styles.rememberMe}>
-              <input
-                type="checkbox"
+                <input
+                  type="checkbox"
                 id="rememberMe"
                 name="rememberMe"
                 checked={formData.rememberMe}
@@ -127,9 +152,9 @@ export default function ManagerLoginPage() {
                 disabled={loading}
               />
               <label htmlFor="rememberMe" className={styles.label}>
-                Remember me
-              </label>
-            </div>
+                  Remember me
+                </label>
+              </div>
 
             {error && (
               <div className={styles.error}>
@@ -137,13 +162,13 @@ export default function ManagerLoginPage() {
               </div>
             )}
 
-            <button 
-              type="submit" 
+              <button
+                type="submit"
               className={`${styles.button} ${loading ? styles.buttonLoading : ''}`}
-              disabled={loading}
+                disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign in as Manager'}
-            </button>
+              </button>
           </form>
 
           <div className={styles.footer}>
@@ -161,4 +186,4 @@ export default function ManagerLoginPage() {
       </div>
     </div>
   );
-} 
+}
