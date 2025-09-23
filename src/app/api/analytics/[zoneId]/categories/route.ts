@@ -4,7 +4,7 @@ import { authenticateRequest } from '@/lib/auth';
 
 export async function GET(
   req: Request,
-  { params }: { params: { zoneId: string } }
+  { params }: { params: Promise<{ zoneId: string }> }
 ) {
   try {
     await connectDB();
@@ -20,7 +20,7 @@ export async function GET(
       );
     }
 
-    const zoneId = params.zoneId;
+    const { zoneId } = await params;
     
     // Mock category data - in a real implementation, this would be calculated from actual data
     const categoryData = [

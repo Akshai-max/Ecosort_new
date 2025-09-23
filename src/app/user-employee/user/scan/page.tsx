@@ -1,259 +1,316 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import styles from './scan.module.css';
+import React from "react";
 
-interface UserData {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  points: number;
-  rank: string;
-  scannedItems: number;
-  rewards: number;
-}
-
-type WasteType = 'plastic' | 'paper' | 'glass' | 'metal' | 'electronics' | 'other';
-
-interface WasteItem {
-  type: WasteType;
-  points: number;
+type PredictionResult = {
+  category: string;
+  confidence: number;
   description: string;
-}
+  disposal: string;
+  overallAccuracy: number;
+  timestamp: string;
+  modelVersion: string;
+};
 
 export default function ScanPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [cameraActive, setCameraActive] = useState(false);
-  const [selectedWasteType, setSelectedWasteType] = useState<WasteType | null>(null);
-  const [scanResult, setScanResult] = useState<WasteItem | null>(null);
-  const [scanning, setScanning] = useState(false);
+  const [file, setFile] = React.useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [result, setResult] = React.useState<PredictionResult | null>(null);
+  const classes = React.useMemo(
+    () => [
+      "plastic",
+      "paper",
+      "glass",
+      "metal",
+      "organic",
+      "electronic",
+      "textile",
+      "hazardous",
+    ],
+    []
+  );
 
-  // Waste type definitions with points
-  const wasteTypes: Record<WasteType, { points: number; description: string }> = {
-    plastic: { points: 10, description: 'Plastic bottles, containers, bags' },
-    paper: { points: 5, description: 'Newspapers, magazines, cardboard' },
-    glass: { points: 15, description: 'Glass bottles, jars, containers' },
-    metal: { points: 20, description: 'Aluminum cans, steel containers' },
-    electronics: { points: 30, description: 'Phones, batteries, small appliances' },
-    other: { points: 5, description: 'Other recyclable materials' }
+  const colorByClass = React.useMemo(
+    () => ({
+      plastic: { bg: "#DBEAFE", text: "#1D4ED8" }, // blue
+      paper: { bg: "#FEF3C7", text: "#B45309" }, // amber
+      glass: { bg: "#CCFBF1", text: "#0F766E" }, // teal
+      metal: { bg: "#E5E7EB", text: "#374151" }, // gray
+      organic: { bg: "#DCFCE7", text: "#166534" }, // green
+      electronic: { bg: "#F3E8FF", text: "#6D28D9" }, // purple
+      textile: { bg: "#FEF9C3", text: "#92400E" }, // yellow
+      hazardous: { bg: "#FEE2E2", text: "#B91C1C" }, // red
+    }),
+    []
+  );
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setError(null);
+    setResult(null);
+    const f = e.target.files?.[0] || null;
+    setFile(f);
+    if (f) {
+      const url = URL.createObjectURL(f);
+      setPreviewUrl(url);
+    } else {
+      setPreviewUrl(null);
+    }
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('/api/user/profile');
-        
-        if (!response.ok) {
-          if (response.status === 401) {
-            router.push('/login');
-            return;
-          }
-          throw new Error('Failed to fetch user data');
-        }
-        
-        const data = await response.json();
-        // Add placeholder data for points, rank, scannedItems, and rewards
-        const userWithStats = {
-          ...data.user,
-          points: 1250,
-          rank: 'Silver',
-          scannedItems: 42,
-          rewards: 3
-        };
-        setUser(userWithStats);
-      } catch (err) {
-        setError('Failed to load user data');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [router]);
-
-  const toggleCamera = () => {
-    setCameraActive(!cameraActive);
+  const onDrop = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    setError(null);
+    const f = e.dataTransfer.files?.[0] || null;
+    setFile(f);
+    if (f) {
+      const url = URL.createObjectURL(f);
+      setPreviewUrl(url);
+    }
   };
 
-  const handleWasteTypeSelect = (type: WasteType) => {
-    setSelectedWasteType(type);
+  const onDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
   };
 
-  const handleScan = () => {
-    if (!selectedWasteType) {
-      setError('Please select a waste type before scanning');
+  const handleScan = async (): Promise<void> => {
+    setError(null);
+    setResult(null);
+    if (!file) {
+      setError("Please select an image first.");
       return;
     }
-
-    setScanning(true);
-    setError('');
-
-    // Simulate scanning process
-    setTimeout(() => {
-      const wasteItem: WasteItem = {
-        type: selectedWasteType,
-        points: wasteTypes[selectedWasteType].points,
-        description: wasteTypes[selectedWasteType].description
-      };
-      
-      setScanResult(wasteItem);
-      setScanning(false);
-      
-      // Update user points (in a real app, this would be an API call)
-      if (user) {
-        setUser({
-          ...user,
-          points: user.points + wasteItem.points,
-          scannedItems: user.scannedItems + 1
-        });
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("/api/ml/classify", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `Request failed (${res.status})`);
       }
-    }, 2000);
+      const data = (await res.json()) as PredictionResult;
+      setResult(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unexpected error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleReset = () => {
-    setSelectedWasteType(null);
-    setScanResult(null);
-    setError('');
-  };
+  const downloadSummaryImage = async (): Promise<void> => {
+    if (!result) return;
+    const width = 900;
+    const height = 500;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <div className={styles.loader}>
-        </div>
-      </div>
-    );
-  }
+    // Background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    // Title
+    ctx.fillStyle = "#111827";
+    ctx.font = "bold 28px Arial";
+    ctx.fillText("Ecosort - Scan Result", 24, 48);
+
+    // Confidence bar
+    const conf = Math.max(0, Math.min(1, result.confidence));
+    ctx.font = "16px Arial";
+    ctx.fillText(`Prediction: ${result.category}`, 24, 92);
+    ctx.fillText(`Confidence: ${(conf * 100).toFixed(1)}%`, 24, 116);
+    const barX = 24;
+    const barY = 132;
+    const barW = width - 48;
+    const barH = 20;
+    ctx.fillStyle = "#e5e7eb";
+    ctx.fillRect(barX, barY, barW, barH);
+    ctx.fillStyle = "#16a34a";
+    ctx.fillRect(barX, barY, barW * conf, barH);
+
+    // Class list
+    ctx.font = "bold 20px Arial";
+    ctx.fillStyle = "#111827";
+    ctx.fillText("Classes:", 24, 184);
+    ctx.font = "18px Arial";
+    const startY = 212;
+    const lineH = 32;
+    classes.forEach((c, i) => {
+      const y = startY + i * lineH;
+      if (c.toLowerCase() === result.category.toLowerCase()) {
+        ctx.fillStyle = "#ef4444"; // red for predicted
+        ctx.fillText(`${c}  ${(conf * 100).toFixed(1)}%`, 48, y);
+      } else {
+        ctx.fillStyle = "#374151";
+        ctx.fillText(c, 48, y);
+      }
+    });
+
+    // If thumbnail exists
+    if (previewUrl) {
+      await new Promise<void>((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const thumbW = 300;
+          const thumbH = 200;
+          const x = width - thumbW - 24;
+          const y = height - thumbH - 24;
+          ctx.drawImage(img, x, y, thumbW, thumbH);
+          ctx.strokeStyle = "#9ca3af";
+          ctx.strokeRect(x, y, thumbW, thumbH);
+          resolve();
+        };
+        img.src = previewUrl;
+      });
+    }
+
+    const link = document.createElement("a");
+    link.download = `ecosort_result_${Date.now()}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
 
   return (
-    <div className={styles.scanContainer}>
-      <div className={styles.cameraSection}>
-        <div className={styles.cameraPlaceholder}>
-          {cameraActive ? (
-            <div className={styles.cameraActive}>
-              <div className={styles.cameraFrame}></div>
-              <div className={styles.cameraOverlay}>
-                <div className={styles.scanLine}></div>
-              </div>
-            </div>
-          ) : (
-            <div className={styles.cameraInactive}>
-              <span className={styles.cameraIcon}>📷</span>
-              <p>Camera is inactive</p>
-            </div>
-          )}
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: 16 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>Scan Waste</h1>
+        <p style={{ color: "#555", marginBottom: 16 }}>
+          Upload an image and click Scan Now to classify the waste type.
+        </p>
+
+      {/* Green themed drop area */}
+      <div
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        style={{
+          border: 0,
+          borderRadius: 20,
+          padding: 32,
+          textAlign: "center",
+          background: "#16a34a",
+          marginBottom: 16,
+          boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
+        }}
+      >
+        {/* Content */}
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={onFileChange}
+            style={{ display: "block", margin: "0 auto 8px" }}
+          />
+          <div style={{ color: "#ffffff" }}>
+            Drag & drop an image here, or click to select.
+          </div>
         </div>
-        <button 
-          className={styles.cameraToggle}
-          onClick={toggleCamera}
+      </div>
+
+      {previewUrl && (
+        <div style={{ marginBottom: 16, textAlign: "center" }}>
+          <img
+            src={previewUrl}
+            alt="preview"
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+              borderRadius: 12,
+              boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+              display: "block",
+              margin: "0 auto",
+            }}
+          />
+        </div>
+      )}
+
+      <button
+        onClick={handleScan}
+        disabled={loading || !file}
+        style={{
+          padding: "10px 16px",
+          background: loading || !file ? "#9ca3af" : "#2563eb",
+          color: "white",
+          border: 0,
+          borderRadius: 8,
+          cursor: loading || !file ? "not-allowed" : "pointer",
+        }}
+      >
+        {loading ? "Scanning..." : "Scan Now"}
+      </button>
+
+      {error && (
+        <div style={{ color: "#b91c1c", marginTop: 12 }}>Error: {error}</div>
+      )}
+
+      {result && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 16,
+            border: "1px solid #e5e7eb",
+            borderRadius: 12,
+            background: "#ffffff",
+          }}
         >
-          {cameraActive ? 'Turn Off Camera' : 'Turn On Camera'}
-        </button>
-      </div>
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>Prediction</div>
+          <div>Category: {result.category}</div>
+          <div>Confidence: {(result.confidence * 100).toFixed(1)}%</div>
+          <div style={{ color: "#6b7280", marginTop: 4 }}>Description: {result.description}</div>
+          <div style={{ color: "#16a34a", marginTop: 4, fontWeight: 500 }}>Disposal: {result.disposal}</div>
+          <div style={{ color: "#6b7280", marginTop: 4, fontSize: "0.875rem" }}>
+            Model Accuracy: {(result.overallAccuracy * 100).toFixed(1)}%
+          </div>
 
-      <div className={styles.scanControls}>
-        <h2 className={styles.sectionTitle}>Select Waste Type</h2>
-        
-        {error && <div className={styles.error}>{error}</div>}
-        
-        <div className={styles.wasteTypeGrid}>
-          {Object.entries(wasteTypes).map(([type, info]) => (
+          {/* Classes board */}
+          <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 12 }}>
+            {classes.map((c) => {
+              const isPred = result && c.toLowerCase() === result.category.toLowerCase();
+              const palette = colorByClass[c as keyof typeof colorByClass] || { bg: "#fff", text: "#111827" };
+              return (
+                <div
+                  key={c}
+                  style={{
+                    border: isPred ? `2px solid ${palette.text}` : "1px solid #e5e7eb",
+                    borderRadius: 10,
+                    padding: 10,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    background: isPred ? palette.bg : "#ffffff",
+                    color: isPred ? palette.text : "#111827",
+                    fontWeight: isPred ? 700 : 600,
+                  }}
+                >
+                  <span>{c}</span>
+                  {isPred && <span>{(result.confidence * 100).toFixed(1)}%</span>}
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ marginTop: 12 }}>
             <button
-              key={type}
-              className={`${styles.wasteTypeButton} ${selectedWasteType === type ? styles.selectedWasteType : ''}`}
-              onClick={() => handleWasteTypeSelect(type as WasteType)}
+              onClick={downloadSummaryImage}
+              style={{
+                padding: "8px 12px",
+                background: "#10b981",
+                color: "white",
+                border: 0,
+                borderRadius: 8,
+                cursor: "pointer",
+              }}
             >
-              <span className={styles.wasteTypeIcon}>
-                {type === 'plastic' && '🥤'}
-                {type === 'paper' && '📄'}
-                {type === 'glass' && '🥃'}
-                {type === 'metal' && '🥫'}
-                {type === 'electronics' && '📱'}
-                {type === 'other' && '♻️'}
-              </span>
-              <span className={styles.wasteTypeName}>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
-              <span className={styles.wasteTypePoints}>{info.points} pts</span>
-            </button>
-          ))}
-        </div>
-
-        {scanResult ? (
-          <div className={styles.scanResult}>
-            <h3 className={styles.resultTitle}>Scan Result</h3>
-            <div className={styles.resultContent}>
-              <div className={styles.resultItem}>
-                <span className={styles.resultLabel}>Waste Type:</span>
-                <span className={styles.resultValue}>{scanResult.type.charAt(0).toUpperCase() + scanResult.type.slice(1)}</span>
-              </div>
-              <div className={styles.resultItem}>
-                <span className={styles.resultLabel}>Description:</span>
-                <span className={styles.resultValue}>{scanResult.description}</span>
-              </div>
-              <div className={styles.resultItem}>
-                <span className={styles.resultLabel}>Points Earned:</span>
-                <span className={styles.resultValue}>{scanResult.points}</span>
-              </div>
-            </div>
-            <div className={styles.resultActions}>
-              <button className={styles.resetButton} onClick={handleReset}>
-                Scan Another Item
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.scanActions}>
-            <button 
-              className={styles.scanButton}
-              onClick={handleScan}
-              disabled={!selectedWasteType || scanning}
-            >
-              {scanning ? 'Scanning...' : 'Scan Item'}
+              Download Result Image
             </button>
           </div>
-        )}
-      </div>
-
-      <div className={styles.pointsSummary}>
-        <h2 className={styles.sectionTitle}>Your Points Summary</h2>
-        <div className={styles.pointsGrid}>
-          <div className={styles.pointsCard}>
-            <div className={styles.pointsIcon}>🏆</div>
-            <div className={styles.pointsInfo}>
-              <h3 className={styles.pointsTitle}>Current Rank</h3>
-              <p className={styles.pointsValue}>{user?.rank || 'Bronze'}</p>
-            </div>
-          </div>
-          <div className={styles.pointsCard}>
-            <div className={styles.pointsIcon}>📊</div>
-            <div className={styles.pointsInfo}>
-              <h3 className={styles.pointsTitle}>Total Points</h3>
-              <p className={styles.pointsValue}>{user?.points || 0}</p>
-            </div>
-          </div>
-          <div className={styles.pointsCard}>
-            <div className={styles.pointsIcon}>📱</div>
-            <div className={styles.pointsInfo}>
-              <h3 className={styles.pointsTitle}>Scanned Items</h3>
-              <p className={styles.pointsValue}>{user?.scannedItems || 0}</p>
-            </div>
-          </div>
-          <div className={styles.pointsCard}>
-            <div className={styles.pointsIcon}>🎁</div>
-            <div className={styles.pointsInfo}>
-              <h3 className={styles.pointsTitle}>Available Rewards</h3>
-              <p className={styles.pointsValue}>{user?.rewards || 0}</p>
-            </div>
-          </div>
         </div>
-      </div>
+      )}
     </div>
   );
-} 
+}

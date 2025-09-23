@@ -20,13 +20,14 @@ import {
   Settings
 } from 'lucide-react';
 import styles from './notifications.module.css';
+import { Profiles, Employee as EmployeeAPI } from '@/services/api';
 
 interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'task_assigned' | 'task_completed' | 'issue_reported' | 'announcement' | 'reminder' | 'achievement' | 'system';
-  priority: 'low' | 'medium' | 'high';
+  type: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
   isRead: boolean;
   createdAt: string;
   expiresAt?: string;
@@ -55,107 +56,20 @@ export default function EmployeeNotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      // Mock data - replace with actual API call
-      const mockNotifications: Notification[] = [
-        {
-          id: 'N001',
-          title: 'New Task Assigned',
-          message: 'You have been assigned a new task: "Collect waste from Main Street". Due date: Today at 2:00 PM',
-          type: 'task_assigned',
-          priority: 'high',
-          isRead: false,
-          createdAt: '2024-01-15T10:30:00Z',
-          actionUrl: '/user-employee/employee/tasks',
-          actionText: 'View Task',
-          sender: 'Manager Smith'
-        },
-        {
-          id: 'N002',
-          title: 'Task Completed Successfully',
-          message: 'Great job! You completed the task "Sort recyclables at Station B" and earned 30 points.',
-          type: 'task_completed',
-          priority: 'medium',
-          isRead: false,
-          createdAt: '2024-01-15T09:15:00Z',
-          actionUrl: '/user-employee/employee/performance',
-          actionText: 'View Performance',
-          sender: 'System'
-        },
-        {
-          id: 'N003',
-          title: 'Manager Announcement',
-          message: 'Important: Collection schedule has been updated for this week. Please check your zone map for new routes.',
-          type: 'announcement',
-          priority: 'high',
-          isRead: true,
-          createdAt: '2024-01-14T16:00:00Z',
-          actionUrl: '/user-employee/employee/zone',
-          actionText: 'View Zone',
-          sender: 'Manager Johnson'
-        },
-        {
-          id: 'N004',
-          title: 'Equipment Maintenance Reminder',
-          message: 'Reminder: Sorting machine at Station A requires maintenance. Please report any issues immediately.',
-          type: 'reminder',
-          priority: 'medium',
-          isRead: false,
-          createdAt: '2024-01-14T14:30:00Z',
-          actionUrl: '/user-employee/employee/scan',
-          actionText: 'Report Issue',
-          sender: 'System'
-        },
-        {
-          id: 'N005',
-          title: 'Achievement Unlocked!',
-          message: 'Congratulations! You have unlocked the "Task Master" achievement for completing 10 tasks.',
-          type: 'achievement',
-          priority: 'low',
-          isRead: true,
-          createdAt: '2024-01-13T11:45:00Z',
-          actionUrl: '/user-employee/employee/performance',
-          actionText: 'View Achievement',
-          sender: 'System'
-        },
-        {
-          id: 'N006',
-          title: 'Issue Reported in Your Zone',
-          message: 'A new issue has been reported in Downtown Zone: "Overflowing waste bin at Main Square". Please investigate.',
-          type: 'issue_reported',
-          priority: 'high',
-          isRead: false,
-          createdAt: '2024-01-13T08:20:00Z',
-          actionUrl: '/user-employee/employee/zone',
-          actionText: 'View Zone',
-          sender: 'Citizen Report'
-        },
-        {
-          id: 'N007',
-          title: 'Weekly Performance Summary',
-          message: 'Your weekly performance: 5 tasks completed, 120 points earned. You are ranked #3 among employees.',
-          type: 'system',
-          priority: 'low',
-          isRead: true,
-          createdAt: '2024-01-12T18:00:00Z',
-          actionUrl: '/user-employee/employee/performance',
-          actionText: 'View Performance',
-          sender: 'System'
-        },
-        {
-          id: 'N008',
-          title: 'Schedule Change',
-          message: 'Your collection schedule for tomorrow has been updated. New start time: 8:30 AM instead of 8:00 AM.',
-          type: 'announcement',
-          priority: 'medium',
-          isRead: false,
-          createdAt: '2024-01-12T15:30:00Z',
-          actionUrl: '/user-employee/employee/zone',
-          actionText: 'View Schedule',
-          sender: 'Manager Wilson'
-        }
-      ];
-      
-      setNotifications(mockNotifications);
+      const prof = await Profiles.employee();
+      const res = await EmployeeAPI.notifications(prof.employee.id);
+      const mapped: Notification[] = (res.notifications || []).map((n: any) => ({
+        id: n.id,
+        title: n.title,
+        message: n.message,
+        type: n.type,
+        priority: (n.priority || 'low') as any,
+        isRead: n.status === 'read',
+        createdAt: n.timestamp,
+        actionUrl: n.actionUrl,
+        metadata: n.metadata,
+      }));
+      setNotifications(mapped);
     } catch (err) {
       setError('Failed to load notifications');
       console.error(err);
@@ -181,8 +95,8 @@ export default function EmployeeNotificationsPage() {
 
     // Sort by priority and date
     filtered.sort((a, b) => {
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
-      const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+      const priorityOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+      const priorityDiff = (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
       if (priorityDiff !== 0) return priorityDiff;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });

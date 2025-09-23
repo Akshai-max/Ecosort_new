@@ -11,6 +11,7 @@ import {
   Activity
 } from 'lucide-react';
 import styles from './DashboardHome.module.css';
+import { Profiles, Manager as ManagerAPI, Analytics, Tasks as TasksAPI, Issues as IssuesAPI } from '@/services/api';
 
 interface DashboardStats {
   totalEmployees: number;
@@ -61,7 +62,7 @@ interface ManagerData {
 }
 
 export default function DashboardHome({ managerId }: DashboardHomeProps = {}) {
-  const [, setManager] = useState<ManagerData | null>(null);
+  const [manager, setManager] = useState<ManagerData | null>(null);
   const [stats, setStats] = useState<DashboardStats>({
     totalEmployees: 0,
     activeTasksToday: 0,
@@ -79,25 +80,16 @@ export default function DashboardHome({ managerId }: DashboardHomeProps = {}) {
       try {
         // Fetch manager data if not provided as prop
         if (!managerId) {
-          const managerResponse = await fetch('/api/manager/profile', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (managerResponse.ok) {
-            const managerData = await managerResponse.json();
-            setManager(managerData.manager);
-          }
+          const data = await Profiles.manager();
+          setManager(data.manager as any);
         }
 
-        // Simulate API calls - replace with actual service calls
+        // Use manager info to drive downstream calls
+        const zoneId = manager?.zoneId || 'Z001';
         await Promise.all([
           fetchStats(),
-          fetchWeeklyTrend(),
-          fetchWasteCategories(),
+          fetchWeeklyTrend(zoneId),
+          fetchWasteCategories(zoneId),
           fetchRecentTasks(),
           fetchRecentIssues()
         ]);
@@ -112,144 +104,94 @@ export default function DashboardHome({ managerId }: DashboardHomeProps = {}) {
   }, [managerId]);
 
   const fetchStats = async () => {
-    // TODO: Replace with actual API call
-    // const response = await fetch(`/api/manager/${managerId}/stats`);
-    // const data = await response.json();
-    
-    // Mock data
-    setStats({
-      totalEmployees: 24,
-      activeTasksToday: 18,
-      wasteCollectedThisWeek: 1250,
-      pendingIssues: 7
-    });
+    try {
+      // Employees count
+      try {
+        const { manager } = await Profiles.manager();
+        // Fetch employees under this manager
+        const employeesRes = await ManagerAPI.employees(manager.id);
+        let totalEmployees = 0;
+        totalEmployees = employeesRes.employees?.length || 0;
+
+        // Active tasks (manager-scoped) and pending issues
+        const [tasksRes, issuesRes] = await Promise.all([
+          TasksAPI.list(),
+          IssuesAPI.list(),
+        ]);
+        let activeTasksToday = 0;
+        activeTasksToday = (tasksRes.tasks || []).filter((t: any) => t.status !== 'completed' && t.status !== 'cancelled').length;
+        let pendingIssues = 0;
+        pendingIssues = (issuesRes.issues || []).filter((i: any) => i.status === 'open' || i.status === 'assigned').length;
+
+        // Waste collected this week can be derived from analytics weekly endpoint sum
+        let wasteCollectedThisWeek = 0;
+        try {
+          const weekly = await Analytics.weekly(manager.zoneId || 'Z001');
+          wasteCollectedThisWeek = weekly.totalWaste || 0;
+        } catch {}
+
+        setStats({ totalEmployees, activeTasksToday, wasteCollectedThisWeek, pendingIssues });
+      } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const fetchWeeklyTrend = async () => {
-    // TODO: Replace with actual API call
-    // const response = await fetch(`/api/analytics/${managerId}/weekly`);
-    // const data = await response.json();
-    
-    // Mock data
-    setWeeklyTrend([
-      { day: 'Mon', waste: 180 },
-      { day: 'Tue', waste: 220 },
-      { day: 'Wed', waste: 195 },
-      { day: 'Thu', waste: 250 },
-      { day: 'Fri', waste: 210 },
-      { day: 'Sat', waste: 175 },
-      { day: 'Sun', waste: 160 }
-    ]);
+  const fetchWeeklyTrend = async (zoneId: string) => {
+    try {
+      const data = await Analytics.weekly(zoneId);
+      setWeeklyTrend((data.weeklyData || []).map((d: any) => ({ day: d.day, waste: d.waste })));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const fetchWasteCategories = async () => {
-    // TODO: Replace with actual API call
-    // const response = await fetch(`/api/analytics/${managerId}/categories`);
-    // const data = await response.json();
-    
-    // Mock data
-    setWasteCategories([
-      { category: 'Plastic', percentage: 35, amount: 437 },
-      { category: 'Paper', percentage: 25, amount: 312 },
-      { category: 'Glass', percentage: 20, amount: 250 },
-      { category: 'Metal', percentage: 15, amount: 187 },
-      { category: 'Other', percentage: 5, amount: 64 }
-    ]);
+  const fetchWasteCategories = async (zoneId: string) => {
+    try {
+      const data = await Analytics.categories(zoneId);
+      const total = data.totalWaste || 0;
+      const categories = (data.categories || []).map((c: any) => ({
+        category: c.category,
+        percentage: total ? Math.round((c.amount / total) * 100) : c.percentage || 0,
+        amount: c.amount,
+      }));
+      setWasteCategories(categories);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const fetchRecentTasks = async () => {
-    // TODO: Replace with actual API call
-    // const response = await fetch(`/api/tasks/${managerId}/recent`);
-    // const data = await response.json();
-    
-    // Mock data
-    setRecentTasks([
-      {
-        id: 'T001',
-        description: 'Collect waste from Zone A',
-        assignedTo: 'John Doe',
-        status: 'in_progress',
-        dueDate: '2024-01-15'
-      },
-      {
-        id: 'T002',
-        description: 'Sort recyclables in Zone B',
-        assignedTo: 'Jane Smith',
-        status: 'pending',
-        dueDate: '2024-01-16'
-      },
-      {
-        id: 'T003',
-        description: 'Maintain sorting equipment',
-        assignedTo: 'Mike Johnson',
-        status: 'completed',
-        dueDate: '2024-01-14'
-      },
-      {
-        id: 'T004',
-        description: 'Update waste inventory',
-        assignedTo: 'Sarah Wilson',
-        status: 'in_progress',
-        dueDate: '2024-01-17'
-      },
-      {
-        id: 'T005',
-        description: 'Clean collection vehicles',
-        assignedTo: 'Tom Brown',
-        status: 'pending',
-        dueDate: '2024-01-18'
-      }
-    ]);
+    try {
+      const data = await TasksAPI.list();
+      const tasks = (data.tasks || []).slice(0, 5).map((t: any) => ({
+        id: t.id || t.taskId,
+        description: t.description || t.title,
+        assignedTo: t.assignedToName || t.assignedTo || '—',
+        status: t.status,
+        dueDate: (t.dueDate || '').toString().slice(0, 10),
+      }));
+      setRecentTasks(tasks);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const fetchRecentIssues = async () => {
-    // TODO: Replace with actual API call
-    // const response = await fetch(`/api/issues/${managerId}/recent`);
-    // const data = await response.json();
-    
-    // Mock data
-    setRecentIssues([
-      {
-        id: 'I001',
-        description: 'Sorting machine malfunction in Zone A',
-        zone: 'Zone A',
-        reportedBy: 'John Doe',
-        status: 'open',
-        priority: 'high'
-      },
-      {
-        id: 'I002',
-        description: 'Insufficient collection bins in Zone B',
-        zone: 'Zone B',
-        reportedBy: 'Jane Smith',
-        status: 'assigned',
-        priority: 'medium'
-      },
-      {
-        id: 'I003',
-        description: 'Vehicle breakdown during collection',
-        zone: 'Zone C',
-        reportedBy: 'Mike Johnson',
-        status: 'resolved',
-        priority: 'high'
-      },
-      {
-        id: 'I004',
-        description: 'Schedule conflict with waste pickup',
-        zone: 'Zone D',
-        reportedBy: 'Sarah Wilson',
-        status: 'open',
-        priority: 'low'
-      },
-      {
-        id: 'I005',
-        description: 'Equipment maintenance overdue',
-        zone: 'Zone E',
-        reportedBy: 'Tom Brown',
-        status: 'assigned',
-        priority: 'medium'
-      }
-    ]);
+    try {
+      const data = await IssuesAPI.list();
+      const issues = (data.issues || []).slice(0, 5).map((i: any) => ({
+        id: i.id,
+        description: i.description || i.title,
+        zone: i.zoneName || i.zoneId,
+        reportedBy: i.reportedByName || i.reportedBy,
+        status: i.status,
+        priority: i.priority,
+      }));
+      setRecentIssues(issues);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -260,6 +202,8 @@ export default function DashboardHome({ managerId }: DashboardHomeProps = {}) {
         return '#f59e0b';
       case 'pending':
         return '#6b7280';
+      case 'cancelled':
+        return '#9ca3af';
       case 'open':
         return '#ef4444';
       case 'assigned':
@@ -282,6 +226,11 @@ export default function DashboardHome({ managerId }: DashboardHomeProps = {}) {
       default:
         return '#6b7280';
     }
+  };
+
+  const toTitleCase = (value: string) => {
+    if (!value) return '';
+    return value.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
   if (loading) {
@@ -434,7 +383,7 @@ export default function DashboardHome({ managerId }: DashboardHomeProps = {}) {
                     className={styles.statusBadge}
                     style={{ backgroundColor: getStatusColor(task.status) }}
                   >
-                    {task.status.replace('_', ' ')}
+                    {toTitleCase(task.status)}
                   </span>
                 </div>
                 <div className={styles.tableCell}>{task.dueDate}</div>
@@ -466,7 +415,7 @@ export default function DashboardHome({ managerId }: DashboardHomeProps = {}) {
                     className={styles.priorityBadge}
                     style={{ backgroundColor: getPriorityColor(issue.priority) }}
                   >
-                    {issue.priority}
+                    {toTitleCase(issue.priority)}
                   </span>
                 </div>
                 <div className={styles.tableCell}>
@@ -474,7 +423,7 @@ export default function DashboardHome({ managerId }: DashboardHomeProps = {}) {
                     className={styles.statusBadge}
                     style={{ backgroundColor: getStatusColor(issue.status) }}
                   >
-                    {issue.status}
+                    {toTitleCase(issue.status)}
                   </span>
                 </div>
               </div>

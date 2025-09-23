@@ -477,7 +477,7 @@ export default function EmployeeScanPage() {
                     setIssueForm({
                       ...issueForm, 
                       type: e.target.value,
-                      priority: selectedType?.priority || 'medium'
+                      priority: (selectedType?.priority as 'low' | 'medium' | 'high') || 'medium'
                     });
                   }}
                   className={styles.formSelect}

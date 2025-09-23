@@ -68,91 +68,32 @@ export default function EmployeeTasksPage() {
 
   const fetchTasks = async () => {
     try {
-      // Mock data - replace with actual API call
-      const mockTasks: Task[] = [
-        {
-          id: 'T001',
-          title: 'Collect waste from Main Street',
-          description: 'Collect all waste bins along Main Street route. Ensure proper sorting of recyclables.',
-          priority: 'high',
-          dueDate: '2024-01-15',
-          status: 'in_progress',
-          assignedBy: 'Manager Smith',
-          zone: 'Downtown Zone',
-          category: 'Collection',
-          estimatedDuration: '2 hours',
-          points: 50,
-          createdAt: '2024-01-10',
-          updatedAt: '2024-01-14',
-          attachments: ['route_map.pdf'],
-          notes: 'Started at 9:00 AM, completed 60%'
-        },
-        {
-          id: 'T002',
-          title: 'Sort recyclables at Station B',
-          description: 'Sort and categorize recyclable materials at Station B. Separate plastic, paper, and metal.',
-          priority: 'medium',
-          dueDate: '2024-01-16',
-          status: 'pending',
-          assignedBy: 'Manager Johnson',
-          zone: 'Downtown Zone',
-          category: 'Sorting',
-          estimatedDuration: '1.5 hours',
-          points: 30,
-          createdAt: '2024-01-12',
-          updatedAt: '2024-01-12'
-        },
-        {
-          id: 'T003',
-          title: 'Report equipment issue',
-          description: 'Check and report status of sorting machine at Station A. Document any malfunctions.',
-          priority: 'low',
-          dueDate: '2024-01-17',
-          status: 'completed',
-          assignedBy: 'Manager Smith',
-          zone: 'Downtown Zone',
-          category: 'Maintenance',
-          estimatedDuration: '30 minutes',
-          points: 20,
-          createdAt: '2024-01-08',
-          updatedAt: '2024-01-13',
-          attachments: ['equipment_report.pdf', 'photo_1.jpg'],
-          notes: 'Machine working properly, no issues found'
-        },
-        {
-          id: 'T004',
-          title: 'Clean collection vehicle',
-          description: 'Thoroughly clean and sanitize collection vehicle #VH-001 after morning route.',
-          priority: 'medium',
-          dueDate: '2024-01-15',
-          status: 'pending',
-          assignedBy: 'Manager Wilson',
-          zone: 'Downtown Zone',
-          category: 'Cleaning',
-          estimatedDuration: '45 minutes',
-          points: 25,
-          createdAt: '2024-01-14',
-          updatedAt: '2024-01-14'
-        },
-        {
-          id: 'T005',
-          title: 'Update waste inventory',
-          description: 'Count and update inventory of collected waste materials for weekly report.',
-          priority: 'high',
-          dueDate: '2024-01-16',
-          status: 'in_progress',
-          assignedBy: 'Manager Smith',
-          zone: 'Downtown Zone',
-          category: 'Administrative',
-          estimatedDuration: '1 hour',
-          points: 40,
-          createdAt: '2024-01-13',
-          updatedAt: '2024-01-14',
-          notes: 'Completed plastic count, working on paper count'
+      const res = await fetch('/api/employee/tasks', { credentials: 'include' });
+      if (!res.ok) {
+        if (res.status === 401) {
+          return router.push('/user-employee/login');
         }
-      ];
-      
-      setTasks(mockTasks);
+        throw new Error('Failed to fetch tasks');
+      }
+      const data = await res.json();
+      const mapped: Task[] = (data.tasks || []).map((t: any) => ({
+        id: t.id || t.taskId,
+        title: t.title,
+        description: t.description,
+        priority: t.priority,
+        dueDate: (t.dueDate || '').toString().slice(0, 10),
+        status: t.status,
+        assignedBy: t.assignedBy,
+        zone: t.zoneId,
+        category: t.tags?.[0] || 'General',
+        estimatedDuration: t.estimatedDuration,
+        points: t.points || 0,
+        createdAt: (t.createdAt || '').toString().slice(0, 10),
+        updatedAt: (t.updatedAt || '').toString().slice(0, 10),
+        attachments: t.proofOfWork,
+        notes: t.notes,
+      }));
+      setTasks(mapped);
     } catch (err) {
       setError('Failed to load tasks');
       console.error(err);

@@ -21,6 +21,7 @@ import {
   Flame
 } from 'lucide-react';
 import styles from './performance.module.css';
+import { Profiles, Performance as PerfAPI } from '@/services/api';
 
 interface PerformanceData {
   currentRank: string;
@@ -86,89 +87,28 @@ export default function EmployeePerformancePage() {
 
   const fetchPerformanceData = async () => {
     try {
-      // Mock data - replace with actual API call
-      const mockData: PerformanceData = {
-        currentRank: 'Silver',
-        currentPoints: 1250,
-        monthlyRank: 3,
-        totalEmployees: 24,
-        monthlyPoints: 450,
-        weeklyPoints: 120,
-        dailyPoints: 25,
-        tasksCompleted: 18,
-        tasksAssigned: 22,
-        completionRate: 82,
-        averageTaskTime: 45,
-        streak: 7,
-        achievements: [
-          {
-            id: 'A001',
-            title: 'First Task',
-            description: 'Complete your first task',
-            icon: '🎯',
-            points: 50,
-            unlockedAt: '2024-01-01',
-            category: 'task'
-          },
-          {
-            id: 'A002',
-            title: 'Task Master',
-            description: 'Complete 10 tasks',
-            icon: '⭐',
-            points: 100,
-            unlockedAt: '2024-01-05',
-            category: 'task'
-          },
-          {
-            id: 'A003',
-            title: 'Scanner Pro',
-            description: 'Scan 50 waste items',
-            icon: '📱',
-            points: 150,
-            unlockedAt: '2024-01-10',
-            category: 'scan'
-          },
-          {
-            id: 'A004',
-            title: 'Week Warrior',
-            description: 'Complete 5 tasks in a week',
-            icon: '🔥',
-            points: 200,
-            unlockedAt: '2024-01-12',
-            category: 'streak'
-          },
-          {
-            id: 'A005',
-            title: 'Silver Rank',
-            description: 'Reach Silver rank',
-            icon: '🥈',
-            points: 300,
-            unlockedAt: '2024-01-15',
-            category: 'special'
-          }
-        ],
-        monthlyHistory: [
-          { month: 'Oct 2023', points: 320, tasksCompleted: 12, rank: 5 },
-          { month: 'Nov 2023', points: 380, tasksCompleted: 15, rank: 4 },
-          { month: 'Dec 2023', points: 420, tasksCompleted: 16, rank: 3 },
-          { month: 'Jan 2024', points: 450, tasksCompleted: 18, rank: 3 }
-        ],
-        weeklyHistory: [
-          { week: 'Week 1', points: 95, tasksCompleted: 4 },
-          { week: 'Week 2', points: 110, tasksCompleted: 5 },
-          { week: 'Week 3', points: 105, tasksCompleted: 4 },
-          { week: 'Week 4', points: 120, tasksCompleted: 5 }
-        ],
-        leaderboard: [
-          { rank: 1, name: 'Sarah Wilson', points: 1850, tasksCompleted: 28, completionRate: 93, isCurrentUser: false },
-          { rank: 2, name: 'Mike Johnson', points: 1650, tasksCompleted: 25, completionRate: 89, isCurrentUser: false },
-          { rank: 3, name: 'John Doe', points: 1250, tasksCompleted: 18, completionRate: 82, isCurrentUser: true },
-          { rank: 4, name: 'Jane Smith', points: 1150, tasksCompleted: 17, completionRate: 78, isCurrentUser: false },
-          { rank: 5, name: 'Tom Brown', points: 980, tasksCompleted: 15, completionRate: 75, isCurrentUser: false }
-        ]
+      const prof = await Profiles.employee();
+      const { performance } = await PerfAPI.forEmployee(prof.employee.id);
+      // Map into local shape, keeping fallbacks to avoid UI breaks
+      const mapped: PerformanceData = {
+        currentRank: performance.currentRank || 'Employee',
+        currentPoints: performance.currentPoints || 0,
+        monthlyRank: performance.monthlyRank || 0,
+        totalEmployees: performance.totalEmployees || 0,
+        monthlyPoints: performance.monthlyPoints || 0,
+        weeklyPoints: performance.weeklyPoints || 0,
+        dailyPoints: performance.dailyPoints || 0,
+        tasksCompleted: performance.tasksCompleted || 0,
+        tasksAssigned: performance.tasksAssigned || 0,
+        completionRate: performance.completionRate || 0,
+        averageTaskTime: performance.averageTaskTime || 0,
+        streak: performance.streak || 0,
+        achievements: performance.achievements || [],
+        monthlyHistory: performance.monthlyHistory || [],
+        weeklyHistory: performance.weeklyHistory || [],
+        leaderboard: performance.leaderboard || [],
       };
-      
-      setPerformanceData(mockData);
+      setPerformanceData(mapped);
     } catch (err) {
       setError('Failed to load performance data');
       console.error(err);

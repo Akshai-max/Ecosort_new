@@ -5,7 +5,7 @@ import { authenticateRequest } from '@/lib/auth';
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -21,7 +21,7 @@ export async function GET(
       );
     }
 
-    const managerId = params.id;
+    const { id: managerId } = await params;
     
     // Verify the manager is accessing their own data or has permission
     if (payload.id !== managerId) {

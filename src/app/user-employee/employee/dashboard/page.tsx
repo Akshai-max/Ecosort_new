@@ -39,6 +39,9 @@ export default function EmployeeDashboardPage() {
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [tasksAssigned, setTasksAssigned] = useState(0);
+  const [tasksCompleted, setTasksCompleted] = useState(0);
+  const [pendingIssues, setPendingIssues] = useState(0);
 
   useEffect(() => {
     const fetchEmployeeData = async () => {
@@ -54,16 +57,20 @@ export default function EmployeeDashboardPage() {
         }
         
         const data = await response.json();
-        // Add placeholder data for employee stats
-        const employeeWithStats = {
-          ...data.employee,
-          points: 1250,
-          rank: 'Senior Specialist',
-          tasksAssigned: 8,
-          tasksCompleted: 5,
-          pendingIssues: 2
-        };
-        setEmployee(employeeWithStats);
+        setEmployee(data.employee);
+        // Parallel fetches for tasks and issues
+        const [tasksRes] = await Promise.all([
+          fetch('/api/employee/tasks', { credentials: 'include' }),
+          // If an employee-specific issues endpoint exists, wire it here
+        ]);
+        if (tasksRes.ok) {
+          const tasksData = await tasksRes.json();
+          const total = tasksData.tasks?.length || 0;
+          const completed = tasksData.tasks?.filter((t: any) => t.status === 'completed').length || 0;
+          setTasksAssigned(total);
+          setTasksCompleted(completed);
+        }
+        // Pending issues currently unknown for employees; default 0
       } catch (err) {
         setError('Failed to load dashboard data');
         console.error(err);
@@ -103,21 +110,21 @@ export default function EmployeeDashboardPage() {
           <div className={styles.statIcon}><ClipboardList style={{ width: "40px", height: "40px" }} className="w-6 h-6 text-green-600" /></div>
           <div className={styles.statInfo}>
             <h3 className={styles.statTitle}>Tasks Assigned</h3>
-            <p className={styles.statValue}>{employee?.tasksAssigned || 0}</p>
+            <p className={styles.statValue}>{tasksAssigned}</p>
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statIcon}><CheckCircle style={{ width: "40px", height: "40px" }} className="w-6 h-6 text-green-600" /></div>
           <div className={styles.statInfo}>
             <h3 className={styles.statTitle}>Tasks Completed</h3>
-            <p className={styles.statValue}>{employee?.tasksCompleted || 0}</p>
+            <p className={styles.statValue}>{tasksCompleted}</p>
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statIcon}><AlertTriangle style={{ width: "40px", height: "40px" }} className="w-6 h-6 text-orange-600" /></div>
           <div className={styles.statInfo}>
             <h3 className={styles.statTitle}>Pending Issues</h3>
-            <p className={styles.statValue}>{employee?.pendingIssues || 0}</p>
+            <p className={styles.statValue}>{pendingIssues}</p>
           </div>
         </div>
         <div className={styles.statCard}>
